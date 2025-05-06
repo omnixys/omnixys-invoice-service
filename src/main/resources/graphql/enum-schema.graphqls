@@ -1,0 +1,10 @@
+enum InvoiceStatusType {
+    PAID
+    OVERDUE
+    PENDING
+}
+
+enum InfoType {
+    INVOICES
+    PAYMENTS
+}

@@ -1,0 +1,36 @@
+input InvoiceInput {
+    amount: Float!
+    dueDate: String!
+    username: String!
+}
+
+input InvoiceUpdateInput {
+    status: InvoiceStatusType
+    dueDate: String!
+}
+
+input PaymentDTO {
+    amount: Float!
+    invoiceId: ID!
+    alreadyPaid: Float!
+}
+
+input PaymentInput {
+    amount: Float!
+}
+
+input InvoiceSearchCriteria {
+    infoType: InfoType
+    status: InvoiceStatusType
+    username: String
+    dueDate: String
+    created: String
+    updated: String
+}
+
+input InfoInput {
+    infoType: InfoType
+    username: String!
+    invoiceId: ID
+    doTotalInfo: Boolean
+}

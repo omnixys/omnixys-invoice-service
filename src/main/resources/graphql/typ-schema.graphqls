@@ -1,0 +1,24 @@
+
+type Invoice {
+    id: String!
+    version: Int!
+    amount: Float!
+    status: InvoiceStatusType!
+    dueDate: String!
+    payments: [ID]
+    created: String!
+    updated: String!
+    username: String!
+}
+
+type Payment @key(fields: "id") {
+    id: ID!
+    amount: Float!
+    created: String!
+}
+
+
+type InvoiceInfoPayload {
+    totalAmount: Float
+    count: Int!
+}
