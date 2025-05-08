@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.security;
+package com.omnixys.invoice.security;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.config;
+package com.omnixys.invoice.config;
 
-import com.gentlecorp.invoice.security.JwtToUserDetailsConverter;
+import com.omnixys.invoice.security.JwtToUserDetailsConverter;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;

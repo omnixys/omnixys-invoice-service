@@ -8,7 +8,7 @@
         <version>3.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.gentlecorp</groupId>
+    <groupId>com.omnixys</groupId>
     <artifactId>invoice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>invoice</name>

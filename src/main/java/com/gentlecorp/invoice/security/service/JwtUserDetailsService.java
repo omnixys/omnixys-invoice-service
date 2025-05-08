@@ -1,9 +1,9 @@
-package com.gentlecorp.invoice.security.service;
+package com.omnixys.invoice.security.service;
 
-import com.gentlecorp.invoice.security.CustomUserDetails;
-import com.gentlecorp.invoice.security.enums.RoleType;
-import com.gentlecorp.invoice.tracing.LoggerPlus;
-import com.gentlecorp.invoice.tracing.LoggerPlusFactory;
+import com.omnixys.invoice.security.CustomUserDetails;
+import com.omnixys.invoice.security.enums.RoleType;
+import com.omnixys.invoice.tracing.LoggerPlus;
+import com.omnixys.invoice.tracing.LoggerPlusFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;

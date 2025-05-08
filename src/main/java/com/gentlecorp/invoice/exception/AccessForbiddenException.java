@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.exception;
+package com.omnixys.invoice.exception;
 
-import com.gentlecorp.invoice.security.enums.RoleType;
+import com.omnixys.invoice.security.enums.RoleType;
 import lombok.Getter;
 
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.dto;
+package com.omnixys.invoice.models.dto;
 
 import java.util.UUID;
 

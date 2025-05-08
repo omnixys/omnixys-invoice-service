@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.events;
+package com.omnixys.invoice.models.events;
 
 import java.time.Instant;
 import java.util.UUID;

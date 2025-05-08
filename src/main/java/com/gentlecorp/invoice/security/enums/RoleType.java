@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.security.enums;
+package com.omnixys.invoice.security.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

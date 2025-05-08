@@ -1,5 +1,5 @@
 
-package com.gentlecorp.invoice.dev;
+package com.omnixys.invoice.dev;
 
 import org.springframework.context.annotation.Profile;
 

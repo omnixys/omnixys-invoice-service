@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.inputs;
+package com.omnixys.invoice.models.inputs;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

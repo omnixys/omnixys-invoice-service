@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.models.entitys;
+package com.omnixys.invoice.models.entitys;
 
-import com.gentlecorp.invoice.models.enums.StatusType;
+import com.omnixys.invoice.models.enums.StatusType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

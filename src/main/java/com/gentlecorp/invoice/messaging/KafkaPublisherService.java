@@ -1,10 +1,10 @@
-package com.gentlecorp.invoice.messaging;
+package com.omnixys.invoice.messaging;
 
-import com.gentlecorp.invoice.config.AppProperties;
-import com.gentlecorp.invoice.models.entitys.Invoice;
-import com.gentlecorp.invoice.models.events.LogDTO;
-import com.gentlecorp.invoice.models.events.SendMail;
-import com.gentlecorp.invoice.tracing.TraceContextUtil;
+import com.omnixys.invoice.config.AppProperties;
+import com.omnixys.invoice.models.entitys.Invoice;
+import com.omnixys.invoice.models.events.LogDTO;
+import com.omnixys.invoice.models.events.SendMail;
+import com.omnixys.invoice.tracing.TraceContextUtil;
 import io.micrometer.observation.annotation.Observed;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.UUID;
 
-import static com.gentlecorp.invoice.messaging.KafkaTopicProperties.TOPIC_ACTIVITY_EVENTS;
-import static com.gentlecorp.invoice.messaging.KafkaTopicProperties.TOPIC_NOTIFICATION_ACCOUNT_CREATED;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_ACTIVITY_EVENTS;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_NOTIFICATION_ACCOUNT_CREATED;
 
 /**
  * Service zum Versenden von Kafka-Nachrichten im Zusammenhang mit Personenereignissen.

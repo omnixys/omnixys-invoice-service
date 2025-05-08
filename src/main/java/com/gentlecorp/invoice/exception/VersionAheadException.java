@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.exception;
+package com.omnixys.invoice.exception;
 
 import lombok.Getter;
 

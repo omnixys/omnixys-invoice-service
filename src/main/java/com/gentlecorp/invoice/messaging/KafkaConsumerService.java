@@ -1,9 +1,9 @@
-package com.gentlecorp.invoice.messaging;
+package com.omnixys.invoice.messaging;
 
-import com.gentlecorp.invoice.models.dto.NewPaymentIdDTO;
-import com.gentlecorp.invoice.service.InvoiceWriteService;
-import com.gentlecorp.invoice.tracing.LoggerPlus;
-import com.gentlecorp.invoice.tracing.LoggerPlusFactory;
+import com.omnixys.invoice.models.dto.NewPaymentIdDTO;
+import com.omnixys.invoice.service.InvoiceWriteService;
+import com.omnixys.invoice.tracing.LoggerPlus;
+import com.omnixys.invoice.tracing.LoggerPlusFactory;
 import io.micrometer.observation.annotation.Observed;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
@@ -25,8 +25,14 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 
-import static com.gentlecorp.invoice.messaging.KafkaTopicProperties.TOPIC_NEW_PAYMENT_ID;
-import static com.gentlecorp.invoice.messaging.KafkaTopicProperties.TOPIC_SYSTEM_SHUTDOWN;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_ALL_RESTART_ORCHESTRATOR;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_ALL_SHUTDOWN_ORCHESTRATOR;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_ALL_START_ORCHESTRATOR;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_RESTART_ORCHESTRATOR;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_SHUTDOWN_ORCHESTRATOR;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_START_ORCHESTRATOR;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_NEW_PAYMENT_ID;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_SYSTEM_SHUTDOWN;
 
 @Service
 @RequiredArgsConstructor
@@ -98,12 +104,59 @@ public class KafkaConsumerService {
         return header != null ? new String(header.value(), StandardCharsets.UTF_8) : null;
     }
 
+    @Observed(name = "kafka-consume.invoice.orchestration")
+    @KafkaListener(
+        topics = {
+            TOPIC_INVOICE_SHUTDOWN_ORCHESTRATOR,
+            TOPIC_INVOICE_START_ORCHESTRATOR,
+            TOPIC_INVOICE_RESTART_ORCHESTRATOR
+        },
+        groupId = "${app.groupId}"
+    )
+    public void handlePersonScoped(ConsumerRecord<String, String> record) {
+        final String topic = record.topic();
+        logger().info("Person-spezifisches Kommando empfangen: {}", topic);
 
-    @Observed(name = "kafka-consume.system-shutdown")
-    @KafkaListener(topics = TOPIC_SYSTEM_SHUTDOWN, groupId = "${app.groupId}")
-    public void consumeShutDown() {
-        System.out.println("Shutting down via ApplicationContext");
-        System.out.println("Bye 🖐🏾");
+        switch (topic) {
+            case TOPIC_INVOICE_SHUTDOWN_ORCHESTRATOR -> shutdown();
+            case TOPIC_INVOICE_RESTART_ORCHESTRATOR -> restart();
+            case TOPIC_INVOICE_START_ORCHESTRATOR -> logger().info("Startsignal für Person-Service empfangen");
+        }
+    }
+
+    @Observed(name = "kafka-consume.all.orchestration")
+    @KafkaListener(
+        topics = {
+            TOPIC_ALL_SHUTDOWN_ORCHESTRATOR,
+            TOPIC_ALL_START_ORCHESTRATOR,
+            TOPIC_ALL_RESTART_ORCHESTRATOR
+        },
+        groupId = "${app.groupId}"
+    )
+    public void handleGlobalScoped(ConsumerRecord<String, String> record) {
+        final String topic = record.topic();
+        logger().info("Globales Systemkommando empfangen: {}", topic);
+
+        switch (topic) {
+            case TOPIC_ALL_SHUTDOWN_ORCHESTRATOR -> shutdown();
+            case TOPIC_ALL_RESTART_ORCHESTRATOR -> restart();
+            case TOPIC_ALL_START_ORCHESTRATOR -> logger().info("Globales Startsignal empfangen");
+        }
+    }
+
+    private void shutdown() {
+        try {
+            logger().info("→ Anwendung wird heruntergefahren (Shutdown-Kommando).");
+            ((ConfigurableApplicationContext) context).close();
+        } catch (Exception e) {
+            logger().error("Fehler beim Shutdown: {}", e.getMessage(), e);
+        }
+    }
+
+
+    private void restart() {
+        logger().info("→ Anwendung wird neugestartet (Restart-Kommando).");
         ((ConfigurableApplicationContext) context).close();
+        // Neustart durch externen Supervisor erwartet
     }
 }

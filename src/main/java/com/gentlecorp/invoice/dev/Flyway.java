@@ -1,5 +1,5 @@
 
-package com.gentlecorp.invoice.dev;
+package com.omnixys.invoice.dev;
 
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;

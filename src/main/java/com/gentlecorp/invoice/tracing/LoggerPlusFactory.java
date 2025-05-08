@@ -1,7 +1,7 @@
-package com.gentlecorp.invoice.tracing;
+package com.omnixys.invoice.tracing;
 
-import com.gentlecorp.invoice.config.AppProperties;
-import com.gentlecorp.invoice.messaging.KafkaPublisherService;
+import com.omnixys.invoice.config.AppProperties;
+import com.omnixys.invoice.messaging.KafkaPublisherService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

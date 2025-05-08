@@ -1,12 +1,12 @@
-package com.gentlecorp.invoice.resolvers;
+package com.omnixys.invoice.resolvers;
 
-import com.gentlecorp.invoice.models.dto.PaymentDTO;
-import com.gentlecorp.invoice.models.inputs.CreateInvoiceInput;
-import com.gentlecorp.invoice.models.mapper.InvoiceMapper;
-import com.gentlecorp.invoice.security.CustomUserDetails;
-import com.gentlecorp.invoice.service.InvoiceWriteService;
-import com.gentlecorp.invoice.tracing.LoggerPlus;
-import com.gentlecorp.invoice.tracing.LoggerPlusFactory;
+import com.omnixys.invoice.models.dto.PaymentDTO;
+import com.omnixys.invoice.models.inputs.CreateInvoiceInput;
+import com.omnixys.invoice.models.mapper.InvoiceMapper;
+import com.omnixys.invoice.security.CustomUserDetails;
+import com.omnixys.invoice.service.InvoiceWriteService;
+import com.omnixys.invoice.tracing.LoggerPlus;
+import com.omnixys.invoice.tracing.LoggerPlusFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

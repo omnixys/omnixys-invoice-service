@@ -1,15 +1,15 @@
-package com.gentlecorp.invoice.service;
+package com.omnixys.invoice.service;
 
-import com.gentlecorp.invoice.exception.NotFoundException;
-import com.gentlecorp.invoice.messaging.KafkaPublisherService;
-import com.gentlecorp.invoice.models.dto.NewPaymentIdDTO;
-import com.gentlecorp.invoice.models.dto.PaymentDTO;
-import com.gentlecorp.invoice.models.entitys.Invoice;
-import com.gentlecorp.invoice.models.enums.StatusType;
-import com.gentlecorp.invoice.repository.InvoiceRepository;
-import com.gentlecorp.invoice.security.CustomUserDetails;
-import com.gentlecorp.invoice.tracing.LoggerPlus;
-import com.gentlecorp.invoice.tracing.LoggerPlusFactory;
+import com.omnixys.invoice.exception.NotFoundException;
+import com.omnixys.invoice.messaging.KafkaPublisherService;
+import com.omnixys.invoice.models.dto.NewPaymentIdDTO;
+import com.omnixys.invoice.models.dto.PaymentDTO;
+import com.omnixys.invoice.models.entitys.Invoice;
+import com.omnixys.invoice.models.enums.StatusType;
+import com.omnixys.invoice.repository.InvoiceRepository;
+import com.omnixys.invoice.security.CustomUserDetails;
+import com.omnixys.invoice.tracing.LoggerPlus;
+import com.omnixys.invoice.tracing.LoggerPlusFactory;
 import io.micrometer.observation.annotation.Observed;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static com.gentlecorp.invoice.models.enums.StatusType.PENDING;
+import static com.omnixys.invoice.models.enums.StatusType.PENDING;
 
 @Service
 @RequiredArgsConstructor

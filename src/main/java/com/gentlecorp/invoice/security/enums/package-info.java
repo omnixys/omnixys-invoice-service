@@ -5,11 +5,11 @@
  * </p>
  *
  * <ul>
- *   <li>{@link com.gentlecorp.customer.security.enums.RoleType} – Definiert Benutzerrollen.</li>
+ *   <li>{@link com.omnixys.customer.security.enums.RoleType} – Definiert Benutzerrollen.</li>
  * </ul>
  *
  * @since 13.03.2025
  * @author <a href="mailto:caleb-script@outlook.de">Caleb Gyamfi</a>
  * @version 1.0
  */
-package com.gentlecorp.invoice.security.enums;
+package com.omnixys.invoice.security.enums;

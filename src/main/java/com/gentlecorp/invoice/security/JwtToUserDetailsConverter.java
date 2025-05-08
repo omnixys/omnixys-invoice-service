@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.security;
+package com.omnixys.invoice.security;
 
-import com.gentlecorp.invoice.security.service.JwtUserDetailsService;
+import com.omnixys.invoice.security.service.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

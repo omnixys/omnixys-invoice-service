@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.payload;
+package com.omnixys.invoice.models.payload;
 
 import java.math.BigDecimal;
 

@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.models.events;
+package com.omnixys.invoice.models.events;
 
-import com.gentlecorp.invoice.models.entitys.Invoice;
+import com.omnixys.invoice.models.entitys.Invoice;
 
 import java.util.UUID;
 

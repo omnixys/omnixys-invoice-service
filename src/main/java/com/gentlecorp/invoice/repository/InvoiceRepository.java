@@ -1,7 +1,7 @@
-package com.gentlecorp.invoice.repository;
+package com.omnixys.invoice.repository;
 
-import com.gentlecorp.invoice.models.entitys.Invoice;
-import com.gentlecorp.invoice.models.enums.StatusType;
+import com.omnixys.invoice.models.entitys.Invoice;
+import com.omnixys.invoice.models.enums.StatusType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

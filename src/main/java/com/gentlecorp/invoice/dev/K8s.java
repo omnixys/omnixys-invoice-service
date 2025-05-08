@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.dev;
+package com.omnixys.invoice.dev;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;

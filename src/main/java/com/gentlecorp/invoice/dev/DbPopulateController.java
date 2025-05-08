@@ -1,5 +1,5 @@
 
-package com.gentlecorp.invoice.dev;
+package com.omnixys.invoice.dev;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

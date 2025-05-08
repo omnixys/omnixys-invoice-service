@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.config;
+package com.omnixys.invoice.config;
 
 import lombok.Getter;
 import lombok.Setter;

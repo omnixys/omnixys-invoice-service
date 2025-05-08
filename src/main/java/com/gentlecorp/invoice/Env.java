@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice;
+package com.omnixys.invoice;
 
 import io.github.cdimascio.dotenv.Dotenv;
 

@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.dto;
+package com.omnixys.invoice.models.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

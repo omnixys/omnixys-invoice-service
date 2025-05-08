@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.config;
+package com.omnixys.invoice.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,8 +7,8 @@ import org.springframework.graphql.client.HttpGraphQlClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static com.gentlecorp.invoice.util.Constants.GRAPHQL_ENDPOINT;
-import static com.gentlecorp.invoice.util.Constants.getServiceValue;
+import static com.omnixys.invoice.util.Constants.GRAPHQL_ENDPOINT;
+import static com.omnixys.invoice.util.Constants.getServiceValue;
 
 
 @SuppressWarnings("java:S1075")

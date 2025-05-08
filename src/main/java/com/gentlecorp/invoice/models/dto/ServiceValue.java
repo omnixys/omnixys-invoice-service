@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.dto;
+package com.omnixys.invoice.models.dto;
 
 public record ServiceValue(
     String schema,

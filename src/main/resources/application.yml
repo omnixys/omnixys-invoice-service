@@ -52,10 +52,10 @@ spring:
           json:
             type:
               mapping: >
-                com.gentlecorp.payment.models.dto.NewPaymentIdDTO:com.gentlecorp.invoice.models.dto.NewPaymentIdDTO
+                com.omnixys.payment.models.dto.NewPaymentIdDTO:com.omnixys.invoice.models.dto.NewPaymentIdDTO
             trusted:
               packages:
-                - com.gentlecorp.payment.models.dto
+                - com.omnixys.payment.models.dto
           deserializer:
             value:
               delegate:
@@ -120,7 +120,7 @@ spring:
 app:
   version: ${spring.application.version}
   name: ${spring.application.name}
-  groupId: gentlecorp-${spring.application.name}
+  groupId: omnixys-${spring.application.name}
   env: ${ACTIVE_PROFILE:dev}
   password: p
   keycloak:
@@ -147,7 +147,7 @@ logging:
       %date{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %5level ${PID:- } --- [%thread]
       %-40.40logger{39} : %m%n%wEx
   level:
-    com.gentlecorp.invoice: trace
+    com.omnixys.invoice: trace
     org.apache.catalina.loader.WebappClassLoaderBase: info
     org.springframework.boot.availability.ApplicationAvailabilityBean: debug
     org.springframework.boot.devtools.autoconfigure.ConditionEvaluationDeltaLoggingListener: warn

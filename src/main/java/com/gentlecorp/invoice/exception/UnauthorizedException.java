@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.exception;
+package com.omnixys.invoice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

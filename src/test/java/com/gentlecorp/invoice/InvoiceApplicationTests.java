@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice;
+package com.omnixys.invoice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

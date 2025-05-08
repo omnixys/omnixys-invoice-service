@@ -1,19 +1,19 @@
-package com.gentlecorp.invoice.service;
+package com.omnixys.invoice.service;
 
-import com.gentlecorp.invoice.exception.AccessForbiddenException;
-import com.gentlecorp.invoice.exception.NotFoundException;
-import com.gentlecorp.invoice.messaging.KafkaPublisherService;
-import com.gentlecorp.invoice.models.dto.PaymentDTO;
-import com.gentlecorp.invoice.models.entitys.Invoice;
-import com.gentlecorp.invoice.models.enums.InfoType;
-import com.gentlecorp.invoice.models.enums.StatusType;
-import com.gentlecorp.invoice.models.payload.InfoPayload;
-import com.gentlecorp.invoice.repository.InvoiceRepository;
-import com.gentlecorp.invoice.repository.SpecificationBuilder;
-import com.gentlecorp.invoice.security.CustomUserDetails;
-import com.gentlecorp.invoice.security.enums.RoleType;
-import com.gentlecorp.invoice.tracing.LoggerPlus;
-import com.gentlecorp.invoice.tracing.LoggerPlusFactory;
+import com.omnixys.invoice.exception.AccessForbiddenException;
+import com.omnixys.invoice.exception.NotFoundException;
+import com.omnixys.invoice.messaging.KafkaPublisherService;
+import com.omnixys.invoice.models.dto.PaymentDTO;
+import com.omnixys.invoice.models.entitys.Invoice;
+import com.omnixys.invoice.models.enums.InfoType;
+import com.omnixys.invoice.models.enums.StatusType;
+import com.omnixys.invoice.models.payload.InfoPayload;
+import com.omnixys.invoice.repository.InvoiceRepository;
+import com.omnixys.invoice.repository.SpecificationBuilder;
+import com.omnixys.invoice.security.CustomUserDetails;
+import com.omnixys.invoice.security.enums.RoleType;
+import com.omnixys.invoice.tracing.LoggerPlus;
+import com.omnixys.invoice.tracing.LoggerPlusFactory;
 import io.micrometer.observation.annotation.Observed;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
@@ -39,8 +39,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.gentlecorp.invoice.security.enums.RoleType.ADMIN;
-import static com.gentlecorp.invoice.security.enums.RoleType.USER;
+import static com.omnixys.invoice.security.enums.RoleType.ADMIN;
+import static com.omnixys.invoice.security.enums.RoleType.USER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Service

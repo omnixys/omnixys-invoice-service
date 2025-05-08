@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.models.enums;
+package com.omnixys.invoice.models.enums;
 
 public enum InfoType {
     INVOICES,

@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice;
+package com.omnixys.invoice;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;

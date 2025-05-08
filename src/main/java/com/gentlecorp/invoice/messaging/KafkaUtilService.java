@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.messaging;
+package com.omnixys.invoice.messaging;
 
 import io.opentelemetry.api.trace.SpanContext;
 import lombok.RequiredArgsConstructor;
@@ -43,13 +43,6 @@ public class KafkaUtilService {
         headers.add(header("x-events-name", topic));
         headers.add(header("x-events-version", version));
         headers.add(header("x-events-type", operation));
-
-//        // ✨ OpenTelemetry-Trace Header
-//        if (spanContext != null && spanContext.isValid()) {
-//            headers.add(header("X-B3-TraceId", spanContext.getTraceId()));
-//            headers.add(header("X-B3-SpanId", spanContext.getSpanId()));
-//            headers.add(header("X-B3-Sampled", spanContext.isSampled() ? "1" : "0"));
-//        }
 
         // ✨ W3C TraceContext Header für Tempo
         if (spanContext != null && spanContext.isValid()) {

@@ -1,4 +1,4 @@
-package com.gentlecorp.invoice.config;
+package com.omnixys.invoice.config;
 
 /**
  * Diese Klasse stellt die zentrale Konfigurationsklasse der Anwendung dar.

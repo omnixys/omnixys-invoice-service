@@ -1,8 +1,8 @@
-package com.gentlecorp.invoice;
+package com.omnixys.invoice;
 
-import com.gentlecorp.invoice.config.AppProperties;
-import com.gentlecorp.invoice.config.ApplicationConfig;
-import com.gentlecorp.invoice.dev.DevConfig;
+import com.omnixys.invoice.config.AppProperties;
+import com.omnixys.invoice.config.ApplicationConfig;
+import com.omnixys.invoice.dev.DevConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.graphql.GraphQlSourceBuilderCustomizer;

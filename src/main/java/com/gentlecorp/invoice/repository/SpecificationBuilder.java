@@ -1,9 +1,9 @@
-package com.gentlecorp.invoice.repository;
+package com.omnixys.invoice.repository;
 
-import com.gentlecorp.invoice.models.entitys.Invoice;
-import com.gentlecorp.invoice.models.entitys.Invoice_;
-import com.gentlecorp.invoice.models.enums.InfoType;
-import com.gentlecorp.invoice.models.enums.StatusType;
+import com.omnixys.invoice.models.entitys.Invoice;
+import com.omnixys.invoice.models.entitys.Invoice_;
+import com.omnixys.invoice.models.enums.InfoType;
+import com.omnixys.invoice.models.enums.StatusType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;

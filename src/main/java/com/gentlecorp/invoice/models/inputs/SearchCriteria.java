@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.models.inputs;
+package com.omnixys.invoice.models.inputs;
 
-import com.gentlecorp.invoice.models.enums.InfoType;
+import com.omnixys.invoice.models.enums.InfoType;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

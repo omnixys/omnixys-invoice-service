@@ -3,11 +3,11 @@
  * <p>
  * Es umfasst:
  * <ul>
- *     <li>{@link com.gentlecorp.customer.config.ApplicationConfig} - Zentrale Konfigurationsklasse</li>
- *     <li>{@link com.gentlecorp.customer.config.EnvConfig} - Umgebungsvariablen-Konfiguration</li>
- *     <li>{@link com.gentlecorp.customer.config.KeycloakClientConfig} - Keycloak-Client-Integration</li>
- *     <li>{@link com.gentlecorp.customer.config.MongoConfig} - MongoDB-Datenbankkonfiguration</li>
- *     <li>{@link com.gentlecorp.customer.config.SecurityConfig} - Sicherheits- und Authentifizierungsregeln</li>
+ *     <li>{@link com.omnixys.customer.config.ApplicationConfig} - Zentrale Konfigurationsklasse</li>
+ *     <li>{@link com.omnixys.customer.config.EnvConfig} - Umgebungsvariablen-Konfiguration</li>
+ *     <li>{@link com.omnixys.customer.config.KeycloakClientConfig} - Keycloak-Client-Integration</li>
+ *     <li>{@link com.omnixys.customer.config.MongoConfig} - MongoDB-Datenbankkonfiguration</li>
+ *     <li>{@link com.omnixys.customer.config.SecurityConfig} - Sicherheits- und Authentifizierungsregeln</li>
  * </ul>
  * </p>
  * <p>
@@ -20,4 +20,4 @@
  * @author <a href="mailto:caleb-script@outlook.de">Caleb Gyamfi</a>
  * @version 1.0
  */
-package com.gentlecorp.invoice.config;
+package com.omnixys.invoice.config;

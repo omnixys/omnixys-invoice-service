@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.util;
+package com.omnixys.invoice.util;
 
-import com.gentlecorp.invoice.models.dto.ServiceValue;
+import com.omnixys.invoice.models.dto.ServiceValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

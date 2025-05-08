@@ -1,6 +1,6 @@
-package com.gentlecorp.invoice.tracing;
+package com.omnixys.invoice.tracing;
 
-import com.gentlecorp.invoice.security.CustomUserDetails;
+import com.omnixys.invoice.security.CustomUserDetails;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import org.springframework.core.env.Environment;
