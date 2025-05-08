@@ -90,3 +90,6 @@ HELP.md
 *.swp
 *.swo
 *.bak
+
+# extras
+.extras/
