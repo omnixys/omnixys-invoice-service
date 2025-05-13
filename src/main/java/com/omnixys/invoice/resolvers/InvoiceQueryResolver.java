@@ -4,6 +4,7 @@ import com.omnixys.invoice.exception.AccessForbiddenException;
 import com.omnixys.invoice.exception.NotFoundException;
 import com.omnixys.invoice.models.entitys.Invoice;
 import com.omnixys.invoice.models.enums.InfoType;
+import com.omnixys.invoice.models.enums.StatusType;
 import com.omnixys.invoice.models.inputs.InfoInput;
 import com.omnixys.invoice.models.inputs.SearchCriteria;
 import com.omnixys.invoice.models.payload.InfoPayload;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,7 +42,7 @@ public class InvoiceQueryResolver {
         return factory.getLogger(getClass());
     }
 
-    @QueryMapping("invoice")
+    @QueryMapping("invoiceById")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SUPREME', 'ELITE', 'BASIC')")
     Invoice getById(
         @Argument("id") final UUID id,
@@ -70,42 +72,54 @@ public class InvoiceQueryResolver {
         return invoices;
     }
 
-    @QueryMapping("totalInvoicesInfo")
+    @QueryMapping("invoicesByCustomer")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SUPREME', 'ELITE', 'BASIC')")
-    InfoPayload overallInfo(
+    Collection<Invoice> getInvoicesByCustomer(
+        @Argument("customerId") UUID customerId,
+        @Argument("searchCriteria") final Optional<SearchCriteria> input,
+        final Authentication authentication
+    ) {
+        logger().debug("getInvoicesByCustomer: customerId={}, searchCriteria={}", customerId, input);
+
+        final var user = (CustomUserDetails) authentication.getPrincipal();
+        final var searchCriteria = input.map(SearchCriteria::toMap).orElse(emptyMap());
+        final var invoices = invoiceReadService.findByCustomer(customerId, searchCriteria, user);
+        logger().debug("getInvoicesByCustomer: Invoices={}", invoices);
+        return invoices;
+    }
+
+    @QueryMapping("totalInvoicesInfo")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    InfoPayload totalInvoiceInfo(
+        @Argument("role") final boolean isIssuer,
+        @Argument("personId") final UUID personId,
         @Argument("infoType") final InfoType infoType,
         @Argument("status") final String statusType,
         final Authentication authentication
     ) {
-        logger().debug("overallInfo: infoType={}, statusType={}", infoType, statusType);
+        logger().debug("totalInvoiceInfo: isIssuer={}, personId={}, infoType={}, statusType={}", isIssuer, personId, infoType, statusType);
 
         final var user = (CustomUserDetails) authentication.getPrincipal();
-        final var payload = invoiceReadService.totalInfo(infoType, statusType, user.getToken());
-        logger().debug("overallInfo: payload={}", payload);
+        final var payload = invoiceReadService.totalInfo(isIssuer, personId, infoType, statusType, user.getToken());
+        logger().debug("totalInvoiceInfo: payload={}", payload);
         return payload;
     }
 
-    @QueryMapping("customerInvoicesInfo")
+    @QueryMapping("invoiceInfoByCustomer")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SUPREME', 'ELITE', 'BASIC')")
-    InfoPayload customerInfo(
-        @Argument("inputs") final InfoInput input,
+    InfoPayload invoiceInfoByCustomer(
+        @Argument("customerId") UUID customerId,
+        @Argument("infoType") InfoType infoType,
+        @Argument("status") final String statusType,
         final Authentication authentication
     ) {
-        logger().debug("customerInfo: inputs={}", input);
+        logger().debug("invoiceInfoByCustomer: infoType={}, statusType={}", infoType, statusType);
 
         final var user = (CustomUserDetails) authentication.getPrincipal();
-
-        final var payload = invoiceReadService.info(
-            input.infoType(),
-            input.username(),
-            input.doTotalInfo(),
-            input.invoiceId(),
-            user.getToken()
-        );
-        logger().debug("customerInfo: payload={}", payload);
+        final var payload = invoiceReadService.infoByCustomer(customerId, infoType, statusType, user);
+        logger().debug("invoiceInfoByCustomer: payload={}", payload);
         return payload;
     }
-
 
     @QueryMapping("paymentInfo")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'SUPREME', 'ELITE', 'BASIC')")

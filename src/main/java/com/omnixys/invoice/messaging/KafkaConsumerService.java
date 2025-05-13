@@ -31,8 +31,7 @@ import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_ALL_START
 import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_RESTART_ORCHESTRATOR;
 import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_SHUTDOWN_ORCHESTRATOR;
 import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_START_ORCHESTRATOR;
-import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_NEW_PAYMENT_ID;
-import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_SYSTEM_SHUTDOWN;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_INVOICE_CREATE_PAYMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class KafkaConsumerService {
         return factory.getLogger(getClass());
     }
 
-    @KafkaListener(topics = TOPIC_NEW_PAYMENT_ID, groupId = "${app.groupId}")
+    @KafkaListener(topics = TOPIC_INVOICE_CREATE_PAYMENT, groupId = "${app.groupId}")
     @Observed(name = "invoice-service.write.finalize-payment")
     public void consumeFinalizePayment(ConsumerRecord<String, NewPaymentIdDTO> record) {
         final var headers = record.headers();
@@ -76,7 +75,7 @@ public class KafkaConsumerService {
         SpanBuilder spanBuilder = tracer.spanBuilder("kafka.invoice.consume")
             .setSpanKind(SpanKind.CONSUMER)
             .setAttribute("messaging.system", "kafka")
-            .setAttribute("messaging.destination", TOPIC_NEW_PAYMENT_ID)
+            .setAttribute("messaging.destination", TOPIC_INVOICE_CREATE_PAYMENT)
             .setAttribute("messaging.operation", "consume");
 
         if (linkedContext != null && linkedContext.isValid()) {
@@ -87,7 +86,7 @@ public class KafkaConsumerService {
 
         try (Scope scope = span.makeCurrent()) {
             assert scope != null;
-            logger().info("📥 Empfangene Nachricht auf '{}': {}", TOPIC_NEW_PAYMENT_ID, newPaymentIdDTO);
+            logger().info("📥 Empfangene Nachricht auf '{}': {}", TOPIC_INVOICE_CREATE_PAYMENT, newPaymentIdDTO);
             invoiceWriteService.finalizePayment(newPaymentIdDTO);
             span.setStatus(StatusCode.OK);
         } catch (Exception e) {

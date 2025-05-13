@@ -7,10 +7,22 @@ schema {
 # Q U E R I E S
 ###############################################################################################
 type Query {
-    invoice(id: ID!): Invoice
+    # Einzelne Rechnung nach ID (Zugriff wird im Backend abgesichert)
+    invoiceById(id: ID!): Invoice
+
+    # Allgemeine Suche über Filter
     invoices(searchCriteria: InvoiceSearchCriteria): [Invoice!]
-    totalInvoicesInfo(infoType: InfoType, status: InvoiceStatusType): InvoiceInfoPayload
-    customerInvoicesInfo(input: InfoInput): InvoiceInfoPayload
+
+    # Alle Rechnungen eines Kunden (als Aussteller ODER Empfänger)
+    invoicesByCustomer(customerId: ID!, searchCriteria: InvoiceSearchCriteria): [Invoice!]
+
+    # Gesamtsummen nach Status (z.B. "alle PAID")
+    totalInvoicesInfo(isIssuer: Boolean, personId: ID, infoType: InfoType, status: InvoiceStatusType): InvoiceInfoPayload
+
+    # Summen und Zähler für einen Kunden (als issuer oder recipient)
+    invoiceInfoByCustomer(customerId: ID!, infoType: InfoType): InvoiceInfoPayload
+
+    # Alle Zahlungen zu einer spezifischen Rechnung
     paymentInfo(invoiceId: ID!): InvoiceInfoPayload
 }
 ###############################################################################################

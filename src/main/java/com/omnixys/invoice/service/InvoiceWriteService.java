@@ -40,8 +40,9 @@ public class InvoiceWriteService {
     }
 
 
+    //TODO mail an billedTo senden
     @Observed(name = "invoice-service.write.create")
-    public UUID create(final Invoice invoice, final CustomUserDetails user) {
+    public UUID create(final Invoice invoice) {
         Span serviceSpan = tracer.spanBuilder("invoice-service.write.create").startSpan();
         try (Scope serviceScope = serviceSpan.makeCurrent()) {
             assert serviceScope != null;

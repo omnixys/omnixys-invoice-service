@@ -65,7 +65,9 @@ public class Invoice {
     @UpdateTimestamp
     private LocalDateTime updated;
 
-    private String username;
+    private UUID issuedBy;
+    private UUID billedTo;
+    private UUID accountId; // ID des Zielkontos
 
     /**
      * Fügt eine neue Zahlungs-ID zur Rechnung hinzu und aktualisiert die persistente Darstellung.

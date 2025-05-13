@@ -8,10 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,6 +49,25 @@ public class SpecificationBuilder {
   }
 
   /**
+   * Erstellt eine OR-verknüpfte JPA-Spezifikation für die gegebenen Schlüssel.
+   */
+  public Optional<Specification<Invoice>> buildOr(final Map<String, ? extends List<Object>> queryParams, List<String> orKeys) {
+    log.debug("buildOr: orKeys={} queryParams={}", orKeys, queryParams);
+    if (queryParams.isEmpty() || orKeys.isEmpty()) return Optional.empty();
+
+    var specs = orKeys.stream()
+        .map(key -> Optional.ofNullable(queryParams.get(key))
+            .map(val -> Map.entry(key, val)))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .map(this::toSpecification)
+        .filter(Objects::nonNull)
+        .toList();
+
+    return specs.isEmpty() ? Optional.empty() : Optional.of(Specification.anyOf(specs));
+  }
+
+  /**
    * Wandelt ein Suchkriterium in eine JPA-Spezifikation um.
    */
   private Specification<Invoice> toSpecification(final Map.Entry<String, ? extends List<Object>> entry) {
@@ -62,10 +83,12 @@ public class SpecificationBuilder {
     return switch (key) {
       case "infoType" -> infoType(value.toString());
       case "status" -> status(value.toString());
-      case "customerId" -> customerId(value.toString());
-      case "dueDate" -> dueDate(value.toString());
-      case "created" -> created(value.toString());
-      case "updated" -> updated(value.toString());
+      case "issuedBy" -> personMatch("issuedBy", value.toString());
+      case "billedTo" -> personMatch("billedTo", value.toString());
+      case "minAmount" -> minAmount(value.toString());
+      case "maxAmount" -> maxAmount(value.toString());
+      case "dueBefore" -> before(value.toString());
+      case "dueAfter" -> after(value.toString());
       default -> {
         log.warn("Unbekanntes Suchkriterium: {}", key);
         yield null;
@@ -101,54 +124,52 @@ public class SpecificationBuilder {
     }
   }
 
-  /**
-   * Erstellt eine Spezifikation für das customerId-Feld.
-   */
-  private Specification<Invoice> customerId(final String value) {
+  private Specification<Invoice> personMatch(String field, String uuid) {
     try {
-      UUID customerUUID = UUID.fromString(value);
-      return (root, query, builder) -> builder.equal(root.get("customerId"), customerUUID);
+      UUID id = UUID.fromString(uuid);
+      return (root, query, cb) -> cb.equal(root.get(field), id);
     } catch (IllegalArgumentException e) {
-      log.error("Ungültiges UUID-Format für customerId: {}", value);
+      log.error("Ungültige UUID für {}: {}", field, uuid);
       return null;
     }
   }
 
-  /**
-   * Erstellt eine Spezifikation für das dueDate-Feld.
-   */
-  private Specification<Invoice> dueDate(final String value) {
+  private Specification<Invoice> before(String value) {
     try {
-      LocalDateTime date = LocalDateTime.parse(value);
-      return (root, query, builder) -> builder.equal(root.get("dueDate"), date);
+      var date = LocalDateTime.parse(value);
+      return (root, query, cb) -> cb.lessThan(root.get("dueDate"), date);
     } catch (DateTimeParseException e) {
-      log.error("Ungültiges Datumsformat für dueDate: {}", value);
+      log.error("Ungültiges Datumsformat (before): {}", value);
       return null;
     }
   }
 
-  /**
-   * Erstellt eine Spezifikation für das created-Feld.
-   */
-  private Specification<Invoice> created(final String value) {
+  private Specification<Invoice> after(String value) {
     try {
-      LocalDateTime date = LocalDateTime.parse(value);
-      return (root, query, builder) -> builder.equal(root.get("created"), date);
+      var date = LocalDateTime.parse(value);
+      return (root, query, cb) -> cb.greaterThan(root.get("dueDate"), date);
     } catch (DateTimeParseException e) {
-      log.error("Ungültiges Datumsformat für created: {}", value);
+      log.error("Ungültiges Datumsformat (after): {}", value);
       return null;
     }
   }
 
-  /**
-   * Erstellt eine Spezifikation für das updated-Feld.
-   */
-  private Specification<Invoice> updated(final String value) {
+  private Specification<Invoice> minAmount(String value) {
     try {
-      LocalDateTime date = LocalDateTime.parse(value);
-      return (root, query, builder) -> builder.equal(root.get("updated"), date);
-    } catch (DateTimeParseException e) {
-      log.error("Ungültiges Datumsformat für updated: {}", value);
+      var amount = new BigDecimal(value);
+      return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("amount"), amount);
+    } catch (NumberFormatException e) {
+      log.error("Ungültiger minAmount: {}", value);
+      return null;
+    }
+  }
+
+  private Specification<Invoice> maxAmount(String value) {
+    try {
+      var amount = new BigDecimal(value);
+      return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("amount"), amount);
+    } catch (NumberFormatException e) {
+      log.error("Ungültiger maxAmount: {}", value);
       return null;
     }
   }

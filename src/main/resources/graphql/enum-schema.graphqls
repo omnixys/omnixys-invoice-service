@@ -8,3 +8,8 @@ enum InfoType {
     INVOICES
     PAYMENTS
 }
+
+enum InvoiceRole {
+    ISSUER
+    RECIPIENT
+}

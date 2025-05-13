@@ -1,5 +1,7 @@
 package com.omnixys.invoice.messaging;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Zentrale Konfiguration der Kafka-Topic-Namen.
  * <p>
@@ -9,19 +11,14 @@ package com.omnixys.invoice.messaging;
  * @author Caleb
  * @since 20.04.2025
  */
+@RequiredArgsConstructor
 public final class KafkaTopicProperties {
 
-    private KafkaTopicProperties() {
-        // Utility class – private Konstruktor verhindert Instanziierung
-    }
-
-    public static final String TOPIC_NEW_PAYMENT_ID = "newPaymentId";
+    public static final String TOPIC_INVOICE_CREATE_PAYMENT = "invoice.create.payment";
     /** ✉️ Mailversand bei Kundenregistrierung */
     public static final String TOPIC_NOTIFICATION_ACCOUNT_CREATED = "notification.invoice.created";
 
-    public static final String TOPIC_ACTIVITY_EVENTS = "activity.invoice.log";
-
-    public static final String TOPIC_SYSTEM_SHUTDOWN = "system.shutdown";
+    public static final String TOPIC_LOG_STREAM_LOG_INVOICE = "log-Stream.log.invoice";
 
     public static final String TOPIC_INVOICE_SHUTDOWN_ORCHESTRATOR = "invoice.shutdown.orchestrator";
     public static final String TOPIC_INVOICE_START_ORCHESTRATOR = "invoice.start.orchestrator";

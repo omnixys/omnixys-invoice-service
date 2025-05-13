@@ -20,6 +20,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.graphql.client.FieldAccessException;
 import org.springframework.graphql.client.GraphQlTransportException;
 import org.springframework.graphql.client.HttpGraphQlClient;
@@ -72,7 +73,7 @@ public class InvoiceReadService {
             assert serviceScope != null;
             logger().debug("findById: id={} user={}", id, user);
             final var invoice = invoiceRepository.findById(id).orElseThrow(NotFoundException::new);
-            validateUserRole(user, invoice);
+            //validateUserRole(user, invoice);
             logger().debug("findById: Invoice={}", invoice);
             return invoice;
         } catch (Exception e) {
@@ -122,6 +123,51 @@ public class InvoiceReadService {
         }
     }
 
+    @Observed(name = "invoice-service.read.find-by-customer")
+    public @NonNull List<Invoice> findByCustomer(final UUID customerId, final Map<String, List<Object>> searchCriteria, final CustomUserDetails user) {
+        Span span = tracer.spanBuilder("invoice-service.read.find-by-customer").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            assert scope != null;
+            logger().debug("findByCustomer: customerId={}, user={}", customerId, user);
+
+            // Zugriffsschutz: Nur eigene Rechnungen oder Admin
+//            if (!user.getPersonId().equals(customerId) && !user.hasRole(ADMIN)) {
+//                throw new AccessForbiddenException("Zugriff auf fremde Rechnungen nicht erlaubt");
+//            }
+
+            // Falls kein Filter: direkte Suche nach Beteiligung
+            if (searchCriteria.isEmpty()) {
+                return invoiceRepository.findByIssuedByOrBilledTo(customerId, customerId);
+            }
+
+            // ODER-Spezifikation: issuedBy == id ODER billedTo == id
+            final var orSpec = specificationBuilder
+                .buildOr(Map.of(
+                    "issuedBy", List.of(customerId),
+                    "billedTo", List.of(customerId)
+                ), List.of("issuedBy", "billedTo"))
+                .orElseThrow(() -> new NotFoundException("Kein Zugriff auf Rechnungen."));
+
+            // UND-Spezifikation aus den eigentlichen Kriterien
+            final var andSpec = specificationBuilder
+                .build(searchCriteria)
+                .orElseThrow(() -> new NotFoundException(searchCriteria));
+
+            final var fullSpec = Specification.where(orSpec).and(andSpec);
+            final var invoices = invoiceRepository.findAll(fullSpec);
+
+            if (invoices.isEmpty()) {
+                throw new NotFoundException(searchCriteria);
+            }
+
+            logger().debug("findByCustomer: invoices={}", invoices);
+            return invoices;
+        } finally {
+            span.end();
+        }
+    }
+
+
     /**
      * Berechnet Gesamtinformationen für Rechnungen anhand des Typs.
      *
@@ -131,15 +177,18 @@ public class InvoiceReadService {
      * @return InfoPayload mit Gesamtanzahl und Gesamtbetrag.
      */
     @Observed(name = "invoice-service.read.total-info")
-    public InfoPayload totalInfo(final InfoType infoType, final String statusType, final String token) {
+    public InfoPayload totalInfo(final boolean isIssuer, final UUID personId, final InfoType infoType, final String statusType, final String token) {
         Span serviceSpan = tracer.spanBuilder("invoice-service.read.total-info").startSpan();
         try (Scope serviceScope = serviceSpan.makeCurrent()) {
             assert serviceScope != null;
-            logger().debug("totalInfo: infoType={} statusType={}", infoType, statusType);
+            logger().debug("totalInfo: isIssuer={} personId={} infoType={} status={}", isIssuer, personId, infoType, statusType);
 
             final var status = StatusType.valueOf(statusType);
 
-            final List<Invoice> invoices = invoiceRepository.findByStatus(status);
+            List<Invoice> invoices = isIssuer
+                ? invoiceRepository.findByIssuedByAndStatus(personId, status)
+                : invoiceRepository.findByBilledToAndStatus(personId, status);
+
 
             return switch (infoType) {
                 case PAYMENTS -> calculatePaymentInfo(invoices, token);
@@ -154,37 +203,26 @@ public class InvoiceReadService {
         }
     }
 
-    /**
-     * Berechnet Gesamtinformationen über Rechnungen oder Zahlungen.
-     *
-     * @param infoType   Der Typ der Information (INVOICE oder PAYMENTS)
-     * @param username Die UUID des Kunden
-     * @param doTotalInfo  Ob die Gesamtinformationen berechnet werden sollen
-     * @param invoiceId  Die UUID der spezifischen Rechnung (nur für PAYMENTS relevant)
-     * @return InfoPayload mit Gesamtanzahl und Gesamtbetrag
-     */
-    @Observed(name = "invoice-service.read.info")
-    public InfoPayload info(final InfoType infoType, final String username, final boolean doTotalInfo, final UUID invoiceId, final String token) {
-        Span serviceSpan = tracer.spanBuilder("invoice-service.read.info").startSpan();
-        try (Scope serviceScope = serviceSpan.makeCurrent()) {
-            assert serviceScope != null;
-            logger().debug("info: infoType={} username={} totalInfo={} invoiceId={}", infoType, username, doTotalInfo, invoiceId);
+    @Observed(name = "invoice-service.read.info-by-customer")
+    public InfoPayload infoByCustomer(UUID customerId, InfoType infoType, String statusType, CustomUserDetails user) {
+        Span span = tracer.spanBuilder("invoice-service.read.info-by-customer").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            assert scope != null;
+            logger().debug("infoByCustomer: customerId={}, infoType={}", customerId, infoType);
 
-            // Gesamtinformationen für einen Kunden abrufen
-            if (doTotalInfo) {
-                return calculateTotalInfo(username, token);
+            StatusType status = null;
+            if (statusType != null && !statusType.isBlank()) {
+                status = StatusType.valueOf(statusType);
             }
 
+            final var invoices = invoiceRepository.findByIssuedByOrBilledToAndOptionalStatus(customerId, customerId, status);
+
             return switch (infoType) {
-                case INVOICES -> calculateInvoiceInfo(username);
-                case PAYMENTS -> calculatePaymentInfo(invoiceId, token);
+                case INVOICES -> calculateInvoiceInfo(invoices);
+                case PAYMENTS -> calculatePaymentInfo(invoices, user.getToken());
             };
-        } catch (Exception e) {
-            serviceSpan.recordException(e);
-            serviceSpan.setAttribute("exception.class", e.getClass().getSimpleName());
-            throw e;
         } finally {
-            serviceSpan.end();
+            span.end();
         }
     }
 
@@ -234,17 +272,6 @@ public class InvoiceReadService {
     }
 
     /**
-     * Berechnet die Gesamtanzahl und Summe aller Rechnungen eines Kunden.
-     *
-     * @param username Die UUID des Kunden
-     * @return InfoPayload mit Gesamtanzahl und Gesamtbetrag
-     */
-    private InfoPayload calculateInvoiceInfo(final String username) {
-        List<Invoice> invoices = invoiceRepository.findByUsername(username);
-        return calculateInvoiceInfo(invoices);
-    }
-
-    /**
      * Berechnet die Gesamtanzahl und Summe aller Rechnungen.
      *
      * @param invoices Liste der Rechnungen.
@@ -289,21 +316,21 @@ public class InvoiceReadService {
      * @param invoiceId Die UUID der Rechnung
      * @return InfoPayload mit Gesamtanzahl und Gesamtbetrag
      */
-    private InfoPayload calculatePaymentInfo(final UUID invoiceId, final String token) {
-        logger().debug("calculatePaymentInfo: invoiceId={}", invoiceId);
-
-        Invoice invoice = invoiceRepository.findById(invoiceId)
-            .orElseThrow(() -> new NotFoundException(invoiceId));
-
-        List<UUID> paymentIds = Optional.ofNullable(invoice.getPayments()).orElse(Collections.emptyList());
-        List<PaymentDTO> payments = fetchPayments(paymentIds, token);
-
-        BigDecimal totalAmount = payments.stream()
-            .map(PaymentDTO::amount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return new InfoPayload(payments.size(), totalAmount);
-    }
+//    private InfoPayload calculatePaymentInfo(final UUID invoiceId, final String token) {
+//        logger().debug("calculatePaymentInfo: invoiceId={}", invoiceId);
+//
+//        Invoice invoice = invoiceRepository.findById(invoiceId)
+//            .orElseThrow(() -> new NotFoundException(invoiceId));
+//
+//        List<UUID> paymentIds = Optional.ofNullable(invoice.getPayments()).orElse(Collections.emptyList());
+//        List<PaymentDTO> payments = fetchPayments(paymentIds, token);
+//
+//        BigDecimal totalAmount = payments.stream()
+//            .map(PaymentDTO::amount)
+//            .reduce(BigDecimal.ZERO, BigDecimal::add);
+//
+//        return new InfoPayload(payments.size(), totalAmount);
+//    }
 
     /**
      * Berechnet die Gesamtanzahl und Summe aller Rechnungen eines Kunden.
@@ -311,26 +338,26 @@ public class InvoiceReadService {
      * @param username Die UUID des Kunden
      * @return InfoPayload mit Gesamtanzahl und Gesamtbetrag
      */
-    private InfoPayload calculateTotalInfo(final String username, final String token) {
-        logger().debug("calculateTotalInfo: username={}", username);
-
-        List<Invoice> invoices = invoiceRepository.findByUsername(username);
-
-        if (invoices.isEmpty()) {
-            return new InfoPayload(0, BigDecimal.ZERO);
-        }
-
-        int count = invoices.stream()
-            .mapToInt(invoice -> invoice.getPayments() != null ? invoice.getPayments().size() : 0)
-            .sum();
-
-        BigDecimal totalAmount = invoices.stream()
-            .flatMap(invoice -> invoice.getPayments() != null ? fetchPayments(invoice.getPayments(), token).stream() : Stream.empty())
-            .map(PaymentDTO::amount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return new InfoPayload(count, totalAmount);
-    }
+//    private InfoPayload calculateTotalInfo(final String username, final String token) {
+//        logger().debug("calculateTotalInfo: username={}", username);
+//
+//        List<Invoice> invoices = invoiceRepository.findByUsername(username);
+//
+//        if (invoices.isEmpty()) {
+//            return new InfoPayload(0, BigDecimal.ZERO);
+//        }
+//
+//        int count = invoices.stream()
+//            .mapToInt(invoice -> invoice.getPayments() != null ? invoice.getPayments().size() : 0)
+//            .sum();
+//
+//        BigDecimal totalAmount = invoices.stream()
+//            .flatMap(invoice -> invoice.getPayments() != null ? fetchPayments(invoice.getPayments(), token).stream() : Stream.empty())
+//            .map(PaymentDTO::amount)
+//            .reduce(BigDecimal.ZERO, BigDecimal::add);
+//
+//        return new InfoPayload(count, totalAmount);
+//    }
 
 
     //TODO PaymentReadService
@@ -395,16 +422,16 @@ public class InvoiceReadService {
         }
     }
 
-    public void validateUserRole(final UserDetails user, final Invoice invoice) {
-        final var roles = user.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .map(str -> str.substring(RoleType.ROLE_PREFIX.length()))
-            .map(RoleType::valueOf)
-            .collect(Collectors.toSet());
-
-
-        if (!roles.contains(ADMIN) && !roles.contains(USER) && !invoice.getUsername().equals(user.getUsername())) {
-            throw new AccessForbiddenException(user.getUsername(), roles);
-        }
-    }
+//    public void validateUserRole(final UserDetails user, final Invoice invoice) {
+//        final var roles = user.getAuthorities().stream()
+//            .map(GrantedAuthority::getAuthority)
+//            .map(str -> str.substring(RoleType.ROLE_PREFIX.length()))
+//            .map(RoleType::valueOf)
+//            .collect(Collectors.toSet());
+//
+//
+//        if (!roles.contains(ADMIN) && !roles.contains(USER)) {
+//            throw new AccessForbiddenException(user.getUsername(), roles);
+//        }
+//    }
 }

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${app.postgres.url}
-    username: ${app.postgres.username}
-    password: ${app.postgres.password}
+#    url: ${app.postgres.url}
+#    username: ${app.postgres.username}
+#    password: ${app.postgres.password}
     hikari:
       connection-timeout: 10000 # Default: 30_000 = 30 Sekunden
       idle-timeout: 120000 # Default: 600_000 = 10 Minuten
@@ -12,8 +12,6 @@ spring:
   flyway:
     tablespace: invoicespace
     clean-disabled: false
-    locations: classpath:db/migration
-    # create-schemas: false
 
   devtools:
     livereload:

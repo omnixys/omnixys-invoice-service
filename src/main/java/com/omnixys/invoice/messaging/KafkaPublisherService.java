@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.UUID;
 
-import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_ACTIVITY_EVENTS;
+import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_LOG_STREAM_LOG_INVOICE;
 import static com.omnixys.invoice.messaging.KafkaTopicProperties.TOPIC_NOTIFICATION_ACCOUNT_CREATED;
 
 /**
@@ -80,7 +80,7 @@ public class KafkaPublisherService {
             appProperties.getEnv()
         );
 
-        sendKafkaEvent(TOPIC_ACTIVITY_EVENTS, event, "log");
+        sendKafkaEvent(TOPIC_LOG_STREAM_LOG_INVOICE, event, "log");
     }
 
     /**

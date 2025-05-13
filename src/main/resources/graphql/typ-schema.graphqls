@@ -8,7 +8,9 @@ type Invoice {
     payments: [ID]
     created: String!
     updated: String!
-    username: String!
+    accountId: ID
+    issuedBy: ID!       # Person, die die Rechnung erstellt hat
+    billedTo: ID!    # Person, die die Rechnung bezahlen soll
 }
 
 type Payment @key(fields: "id") {
@@ -19,6 +21,6 @@ type Payment @key(fields: "id") {
 
 
 type InvoiceInfoPayload {
-    totalAmount: Float
+    totalAmount: Float!
     count: Int!
 }

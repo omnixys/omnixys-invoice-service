@@ -43,7 +43,8 @@ public class InvoiceMutationResolver {
 
             final var user = (CustomUserDetails) authentication.getPrincipal();
             final var invoiceInput = invoiceMapper.toInvoice(createInvoiceInput);
-            final var id = invoiceWriteService.create(invoiceInput, user);
+            final var id = invoiceWriteService.create(invoiceInput);
+//            final var id = invoiceWriteService.create(invoiceInput, user);
             logger().debug("createInvoice: invoiceId={}", id);
             return id;
     }
