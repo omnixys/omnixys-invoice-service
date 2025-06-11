@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.14.0
 
-ARG JAVA_VERSION=23
+ARG JAVA_VERSION=24
 ARG APP_NAME=invoice
 ARG APP_VERSION=2025.05.16
 
