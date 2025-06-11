@@ -20,6 +20,9 @@ management:
     enable:
       all: true
   endpoints:
+    health:
+      probes:
+        enabled: true
     prometheus:
       enabled: true
     web:
@@ -35,14 +38,12 @@ management:
   otlp:
 
     tracing:
-      # endpoint: http://tempo:4318
-      endpoint: http://localhost:4318/v1/traces
-      # endpoint: http://localhost:4317
+      endpoint: http://${app.tracing.tempo}:4318/v1/traces
 
 # Spring Boot Einstellungen
 spring:
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${app.kafka.host}:9092
     consumer:
       group-id: ${app.groupId}
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -129,6 +130,12 @@ app:
     port: ${KC_SERVICE_PORT}
     realm: ${KC_SERVICE_REALM}
     client-id: ${KC_SERVICE_CLIENT_ID}
+  
+  tracing:
+    tempo: ${TEMPO_HOST}
+
+  kafka:
+    host: ${KAFKA_HOST}
 
 # Logging-Konfiguration
 logging:

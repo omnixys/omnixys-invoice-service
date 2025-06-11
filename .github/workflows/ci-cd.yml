@@ -1,0 +1,191 @@
+name: CI/CD Pipeline – Omnixys Invoice Service
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'  # Nur für Versionstags (z.B. v1.0.0)
+
+env:
+  IMAGE_NAME: ${{ secrets.DOCKER_USER }}/${{ secrets.SERVICE }}
+  SERVER_PORT: ${{ secrets.SERVER_PORT }}
+  TEST_SERVER_PORT: ${{ secrets.TEST_SERVER_PORT }}
+  MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+  MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+  MYSQL_DB: ${{ secrets.MYSQL_DB }}
+
+  ACTIVE_PROFILE: ${{ secrets.ACTIVE_PROFILE }}
+  HTTPS: ${{ secrets.HTTPS }}
+
+  MYSQL_URL: ${{ secrets.MYSQL_URL }}
+  MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+  MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+  MYSQL_TEST_DB: ${{ secrets.MYSQL_TEST_DB }}
+  MYSQL_TEST_USERNAME: ${{ secrets.MYSQL_TEST_USERNAME }}
+  MYSQL_TEST_PASSWORD: ${{ secrets.MYSQL_TEST_PASSWORD }}
+
+  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  KC_SERVICE_SECRET: ${{ secrets.KC_SERVICE_SECRET }}
+  KC_SERVICE_CLIENT_ID: ${{ secrets.KC_SERVICE_CLIENT_ID }}
+  KC_SERVICE_REALM: ${{ secrets.KC_SERVICE_REALM }}
+  KC_SERVICE_HOST: ${{ secrets.KC_SERVICE_HOST }}
+  KC_SERVICE_PORT: ${{ secrets.KC_SERVICE_PORT }}
+
+  KAFKA_HOST: ${{ secrets.KAFKA_HOST }}
+  TEMPO_HOST: ${{ secrets.TEMPO_HOST }}
+  KEYS_PATH: ${{ secrets.KEYS_PATH }}
+
+jobs:
+  build:
+    name: 🔨 Build & Test (Maven)
+    runs-on: ubuntu-latest
+    outputs:
+      CURRENT_DATE: ${{ steps.set_date.outputs.CURRENT_DATE }}
+    strategy:
+      matrix:
+        java-version: [24]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print ref name
+        run: echo "This workflow was triggered by ${{ github.ref_name }}"
+
+      - name: Print actor
+        run: echo "The actor is ${{ github.actor }}"
+
+      - name: Print tag
+        run: echo "The tag is ${{ github.ref_name }}"
+
+      - name: Setup Java ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests=false
+      
+      - name: Set CURRENT_DATE
+        id: set_date
+        run: |
+            DATE=$(date +'%Y-%m-%d')
+            echo "CURRENT_DATE=$DATE" >> $GITHUB_OUTPUT
+    
+      - name: Speichere CURRENT_DATE in Repository-Variable
+        if: ${{ vars.CURRENT_DATE != steps.set_date.outputs.CURRENT_DATE }}  # Bedingung hinzufügen
+        run: |
+          curl -X PATCH \
+          -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/${{ github.repository }}/actions/variables/CURRENT_DATE \
+          -d '{"value": "${{ steps.set_date.outputs.CURRENT_DATE }}"}'
+
+      - name: Upload Build Artifact (JAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: omnixys-invoice-service-jar
+          path: target/*.jar
+
+  # analyze:
+    
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   strategy:
+  #     matrix:
+  #       java-version: [24]
+  #   steps:
+  #   - name: Checkout Repository
+  #     uses: actions/checkout@v4
+
+  #   - name: Set CURRENT_DATE from Build Output
+  #     run: echo "CURRENT_DATE=${{ needs.build.outputs.CURRENT_DATE }}" >> $GITHUB_ENV
+
+  #   - name: Setup Java ${{ matrix.java-version }}
+  #     uses: actions/setup-java@v4
+  #     with:
+  #       distribution: 'temurin'
+  #       java-version: ${{ matrix.java-version }}
+
+  #   - name: Run Unit Tests with Coverage
+  #     run: mvn test jacoco:report
+
+     
+  #   # - name: Deploy to GitHub Pages
+  #   #   uses: peaceiris/actions-gh-pages@v3
+  #   #   with:
+  #   #     github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  #   #     publish_dir: ./docs/backend
+  #   #     destination_dir: backend
+
+  package:
+    name: 📦 Package Application
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.actor == 'caleb-script' && github.event_name == 'push'
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: omnixys-invoice-service-jar
+          path: target
+
+      - name: Archive JAR
+        run: zip -j invoice-service.zip target/*.jar
+
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: invoice-service-package
+          path: invoice-service.zip
+
+  docker:
+    name: 🐳 Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: [build, package]
+    env:
+      CURRENT_DATE: ${{ needs.build.outputs.CURRENT_DATE }}
+    if: github.actor == 'caleb-script' && github.event_name == 'push'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }} .
+  
+        
+      - name: Tag Docker Image
+        run: |
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }} ${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }} ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }}
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }}
+          docker push ${{ env.IMAGE_NAME }}:latest

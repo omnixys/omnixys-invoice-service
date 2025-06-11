@@ -1,0 +1,54 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '16 22 * * 0'  # Wöchentliche Scans am Sonntag um 22:16 UTC
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write  # Erforderlich für Code Scanning Berichte
+      packages: read  # Falls private Abhängigkeiten verwendet werden
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [24]
+        include:
+          - language: java-kotlin
+            build-mode: manual  # Maven benötigt in der Regel manuellen Build
+          # Falls weitere Sprachen benötigt werden, hier ergänzen
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Java ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ matrix.java-version }}
+        cache: 'maven'  # Gradle Cache aktivieren für schnelleren Build
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+        queries: +security-extended,security-and-quality  # Erweiterte Sicherheits- und Qualitätsprüfungen
+
+    - name: Build with Maven
+      run: mvn clean install -DskipTests=true
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
