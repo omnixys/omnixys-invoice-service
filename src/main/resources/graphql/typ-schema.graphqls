@@ -13,10 +13,16 @@ type Invoice {
     billedTo: ID!    # Person, die die Rechnung bezahlen soll
 }
 
-type Payment @key(fields: "id") {
-    id: ID!
-    amount: Float!
-    created: String!
+# type Payment @key(fields: "id") {
+#     id: ID!
+#     amount: Float!
+#     created: String!
+# }
+
+type Payment {
+  id: ID!
+  amount: Float!
+  created: String!
 }
 
 

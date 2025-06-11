@@ -36,7 +36,6 @@ management:
     sampling:
       probability: 1.0
   otlp:
-
     tracing:
       endpoint: http://${app.tracing.tempo}:4318/v1/traces
 

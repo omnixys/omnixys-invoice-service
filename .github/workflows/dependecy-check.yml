@@ -1,4 +1,4 @@
-name: Dependency Check – Account
+name: Dependency Check – Invoice
 
 on:
   workflow_dispatch: # Manuelles Auslösen

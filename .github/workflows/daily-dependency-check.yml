@@ -1,4 +1,4 @@
-name: Daily OWASP Dependency Check – Omnixys Account Service
+name: Daily OWASP Dependency Check – Omnixys Invoice Service
 
 on:
   schedule:
@@ -22,7 +22,7 @@ jobs:
       - name: Run OWASP Dependency Check
         run: |
           dependency-check/dependency-check/bin/dependency-check.sh \
-            --project "Omnixys Account Service" \
+            --project "Omnixys Invoice Service" \
             --scan . \
             --nvdApiKey ${{ secrets.NVD_API_KEY }} \
             --format "HTML" \

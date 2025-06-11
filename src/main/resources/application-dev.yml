@@ -10,8 +10,8 @@ spring:
       minimum-idle: 1 # Default: maximumPoolSize
 
   flyway:
-    tablespace: invoicespace
     clean-disabled: false
+    locations: classpath:db/migration/dev
 
   devtools:
     livereload:

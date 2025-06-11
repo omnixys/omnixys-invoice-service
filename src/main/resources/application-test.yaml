@@ -1,4 +1,9 @@
 spring:
+  
+  flyway:
+      clean-disabled: false
+      locations: classpath:db/migration/test
+
   config:
     activate:
       on-profile: test

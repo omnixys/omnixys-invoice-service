@@ -1,4 +1,4 @@
-name: Security – Omnixys Account Service
+name: Security – Omnixys Invoice Service
 
 on:
   schedule:
@@ -24,7 +24,7 @@ jobs:
       - name: Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@75ba02d6183445fe0761d26e836bde58b1560600
         with:
-          project: "Omnixys-Account-Service"
+          project: "Omnixys-Invoice-Service"
           path: './'
           format: 'HTML'
 
