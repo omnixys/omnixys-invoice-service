@@ -3,7 +3,12 @@ name: Update Docker Image Tag
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write # ← WICHTIG für Cosign ohne Schlüssel (keyless signing)
+
 env:
+  COSIGN_EXPERIMENTAL: "true"
   IMAGE_NAME: ${{ secrets.DOCKER_USER }}/${{ secrets.SERVICE }}
   SERVER_PORT: ${{ secrets.SERVER_PORT }}
   TEST_SERVER_PORT: ${{ secrets.TEST_SERVER_PORT }}
@@ -127,13 +132,3 @@ jobs:
         run: |
           cosign sign --yes ${{ env.IMAGE_NAME }}:${{ vars.CURRENT_DATE }}
           cosign sign --yes ${{ env.IMAGE_NAME }}:latest
-
-      - name: Install CycloneDX Maven Plugin
-        run: |
-          mvn org.cyclonedx:cyclonedx-maven-plugin:2.7.9:makeAggregateBom
-
-      - name: Upload SBOM (CycloneDX)
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-cyclonedx
-          path: target/bom.json
