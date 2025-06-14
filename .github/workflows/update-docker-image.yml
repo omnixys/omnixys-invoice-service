@@ -1,4 +1,4 @@
-name: Update Docker Image Tag
+name: Update Docker Image Tag – Omnixys Invoice Service
 
 on:
   workflow_dispatch:
