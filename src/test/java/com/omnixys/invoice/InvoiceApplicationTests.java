@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest
 class InvoiceApplicationTests {
 
-    @BeforeAll
+  @BeforeAll
 	protected static void setup() {
 		new Env();
 	}
