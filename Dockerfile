@@ -41,7 +41,7 @@ ARG JAVA_VERSION
 
 LABEL org.opencontainers.image.title="${APP_NAME}-service" \
       org.opencontainers.image.description="Omnixys ${APP_NAME}-service – Java ${JAVA_VERSION}, erstellt mit Maven (Spring Boot Layered JAR), Version ${APP_VERSION}, basiert auf Azul Zulu & Ubuntu Jammy." \
-    org.opencontainers.image.version="${APP_VERSION}" \
+      org.opencontainers.image.version="${APP_VERSION}" \
       org.opencontainers.image.licenses="GPL-3.0-or-later" \
       org.opencontainers.image.vendor="omnixys" \
       org.opencontainers.image.authors="caleb.gyamfi@omnixys.com" \
