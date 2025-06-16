@@ -45,8 +45,8 @@ jobs:
   docker:
     name: 🐳 Docker Build & Push
     strategy:
-              matrix:
-                java-version: [24]
+      matrix:
+        java-version: [24]
     runs-on: ubuntu-latest
     if: github.actor == 'caleb-script' && github.event_name == 'push'
     steps:
@@ -130,7 +130,7 @@ jobs:
             REVISION=${{ github.sha }}
             CREATED=${{ vars.CURRENT_DATE }}
             APP_VERSION=${{ vars.CURRENT_DATE }}
-            APP_NAME=${{ secrets.SERVICE }}-service
+            APP_NAME=${{ secrets.SERVICE }}
             JAVA_VERSION=${{ matrix.java-version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
@@ -142,7 +142,6 @@ jobs:
         run: |
           cosign sign --yes --recursive ${{ env.IMAGE_NAME }}:${{ vars.CURRENT_DATE }}
           cosign sign --yes --recursive ${{ env.IMAGE_NAME }}:latest
-
 
       - name: Install CycloneDX Maven Plugin
         run: |
