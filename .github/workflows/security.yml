@@ -1,4 +1,4 @@
-name: Security – Omnixys Invoice Service
+name: Security - Omnixys Invoice Service
 
 on:
   schedule:
@@ -9,11 +9,10 @@ permissions:
   contents: read
   security-events: write
   # actions: read
-  
+
 env:
   IMAGE_NAME: ${{ secrets.DOCKER_USER }}/${{ secrets.SERVICE }}
-  CURRENT_DATE: ${{ vars.CURRENT_DATE }}
-  
+
 jobs:
   dependency-check:
     name: "Security-Dependency-Check-${{ vars.CURRENT_DATE }}"
@@ -34,11 +33,11 @@ jobs:
         with:
           name: Depcheck-report
           path: ./reports
-  
+
   snyk:
     name: "Security-Snyk-Scan-${{ vars.CURRENT_DATE }}"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -65,9 +64,9 @@ jobs:
         run: mvn dependency:resolve
 
       - name: Run Snyk Code Test
-        run: snyk code test --sarif > snyk-code.sarif 
+        run: snyk code test --sarif > snyk-code.sarif
         continue-on-error: true
-        
+
       - name: Run Snyk Code Test JSON
         run:  snyk test --severity-threshold=high --json-file-output=snyk-report.json
         continue-on-error: true
@@ -94,26 +93,26 @@ jobs:
         run: snyk monitor --all-projects #--severity-threshold=high
 
       - name: Run Snyk IaC Test
-        run: snyk iac test --report 
+        run: snyk iac test --report
         continue-on-error: true
 
       - name: Build a Docker Image
-        run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }} .
+        run: docker build -t ${{ env.IMAGE_NAME }}:latest .
 
       - name: Run Snyk Container Monitor
-        run: snyk container monitor ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }} --file=Dockerfile
+        run: snyk container monitor ${{ env.IMAGE_NAME }}:latest --file=Dockerfile
 
       - name: Upload SARIF Report to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk-code.sarif
-        
+
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
         with:
           name: SBOM
           path: target/bom.xml
-  
+
 
   docker-scout:
     name: "Security-Docker-Scout-${{ vars.CURRENT_DATE }}"
@@ -130,14 +129,14 @@ jobs:
         uses: docker/scout-action@0133ff88fe16d4a412dc4827a8fccbccb6b583e0
         with:
           command: quickview
-          image: "${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }}"
+          image: "${{ env.IMAGE_NAME }}:latest"
 
       - name: Docker Scout CVEs
         id: docker-scout-cves
         uses: docker/scout-action@0133ff88fe16d4a412dc4827a8fccbccb6b583e0
         with:
           command: cves
-          image: "${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }}"
+          image: "${{ env.IMAGE_NAME }}:latest"
 
       - name: Save Docker Scout Reports
         run: |
@@ -149,4 +148,4 @@ jobs:
         with:
           name: docker-scout-reports
           path: ./docker-scout-*.md
-         
+
